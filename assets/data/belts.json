@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Black Leather Belt",
+    "description": "Premium quality leather belt for men.",
+    "image": "assets/images/belt1.jpg",
+    "type": "leather",
+    "size": "medium",
+    "gender": "male",
+    "color": "black"
+  },
+  {
+    "title": "Brown Synthetic Belt",
+    "description": "Lightweight and stylish synthetic belt.",
+    "image": "assets/images/belt2.jpg",
+    "type": "synthetic",
+    "size": "small",
+    "gender": "female",
+    "color": "brown"
+  }
+]
