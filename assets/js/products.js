@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     filtersRow.innerHTML = "";
     filters = {};
 
-    // Order: Gender first, then Type
+    // Explicit order: Gender first, then Type
     const attributes = ["gender", "type"];
 
     attributes.forEach((attr, index) => {
@@ -84,11 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const label = document.createElement("label");
         label.className = "form-label fw-semibold d-block mb-2";
         label.textContent = attr.charAt(0).toUpperCase() + attr.slice(1);
-
         wrapper.appendChild(label);
 
         if (attr === "gender") {
-          // Use radio buttons for Gender
+          // Radios for Gender
           const allId = `filterGenderAll`;
           wrapper.innerHTML += `
             <div class="form-check">
@@ -107,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
           });
 
-          // Listen for changes on gender radios
           wrapper
             .querySelectorAll("input[name='filterGender']")
             .forEach((radio) => {
@@ -115,21 +113,27 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
           filters[attr] = wrapper.querySelector("input[name='filterGender']");
-        } else {
-          // Keep dropdown for Type
-          const select = document.createElement("select");
-          select.id = `filter${attr.charAt(0).toUpperCase() + attr.slice(1)}`;
-          select.className = "form-select";
-          select.innerHTML = `<option value="">All</option>`;
+        }
 
+        if (attr === "type") {
           values.forEach((v) => {
-            select.innerHTML += `<option value="${v}">${v}</option>`;
+            const id = `filterType${v}`;
+            wrapper.innerHTML += `
+              <div class="form-check">
+                <input class="form-check-input filter-type" type="checkbox" name="filterType" id="${id}" value="${v}">
+                <label class="form-check-label" for="${id}">${v}</label>
+              </div>
+            `;
           });
 
-          select.addEventListener("change", filterProducts);
+          const typeCheckboxes = wrapper.querySelectorAll(".filter-type");
 
-          wrapper.appendChild(select);
-          filters[attr] = select;
+          // Hook change events
+          typeCheckboxes.forEach((cb) => {
+            cb.addEventListener("change", filterProducts);
+          });
+
+          filters[attr] = typeCheckboxes;
         }
 
         if (index < attributes.length - 1) {
@@ -152,15 +156,20 @@ document.addEventListener("DOMContentLoaded", () => {
           "input[name='filterGender']:checked"
         );
         selected[key] = checked ? checked.value : "";
-      } else {
-        selected[key] = element.value;
+      } else if (key === "type") {
+        const checkedBoxes = Array.from(
+          document.querySelectorAll("input[name='filterType']:checked")
+        );
+        selected[key] = checkedBoxes.map((cb) => cb.value); // array of selected types
       }
     });
 
     document.querySelectorAll(".product-card").forEach((card) => {
-      const matches = Object.entries(selected).every(
-        ([key, value]) => !value || card.dataset[key] === value
-      );
+      const matches = Object.entries(selected).every(([key, value]) => {
+        if (!value || (Array.isArray(value) && value.length === 0)) return true;
+        if (Array.isArray(value)) return value.includes(card.dataset[key]);
+        return card.dataset[key] === value;
+      });
       card.style.display = matches ? "block" : "none";
     });
   }
