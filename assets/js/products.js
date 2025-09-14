@@ -6,21 +6,44 @@ document.addEventListener("DOMContentLoaded", () => {
   let products = [];
   let filters = {};
 
-  // Load JSON for given category
-  async function loadProducts(category) {
+  // Load products from one JSON file
+  async function loadCategory(category) {
     try {
       const response = await fetch(`assets/data/${category}.json`);
-      products = await response.json();
-      buildFilters(products);
-      renderProducts(products);
+      return await response.json();
     } catch (err) {
-      console.error("Error loading products:", err);
+      console.warn(`No data found for category: ${category}`);
+      return []; // return empty if file not found
     }
+  }
+
+  // Load all categories or a single one
+  async function loadProducts(category) {
+    if (category === "all") {
+      const belts = await loadCategory("belts");
+      const wallets = await loadCategory("wallets");
+      const bags = await loadCategory("bags");
+      products = [...belts, ...wallets, ...bags];
+    } else {
+      products = await loadCategory(category);
+    }
+
+    buildFilters(products);
+    renderProducts(products);
   }
 
   // Render product cards
   function renderProducts(data) {
     productGrid.innerHTML = "";
+
+    if (data.length === 0) {
+      productGrid.innerHTML = `
+        <div class="col-12 text-center text-muted py-5">
+          <p>No products available in this category.</p>
+        </div>`;
+      return;
+    }
+
     data.forEach((product) => {
       const card = document.createElement("div");
       card.className = "col-sm-6 col-lg-4 product-card";
@@ -28,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       card.dataset.size = product.size || "";
       card.dataset.gender = product.gender || "";
       card.dataset.color = product.color || "";
+      card.dataset.category = product.category || "";
 
       card.innerHTML = `
         <div class="card h-100 shadow-sm">
@@ -45,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Build filters dynamically
   function buildFilters(data) {
-    filtersRow.innerHTML = ""; // reset
-    filters = {}; // reset references
+    filtersRow.innerHTML = "";
+    filters = {};
 
     const attributes = ["type", "size", "gender", "color"];
 
@@ -76,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.appendChild(label);
         wrapper.appendChild(select);
 
-        // Add <hr> before next filter except after last one
         if (index < attributes.length - 1) {
           const hr = document.createElement("hr");
           wrapper.appendChild(hr);
@@ -88,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Filter logic
+  // Filtering logic
   function filterProducts() {
     const selected = {};
     Object.entries(filters).forEach(([key, select]) => {
@@ -103,11 +126,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Category change
+  // Handle category change
   categorySelector.addEventListener("change", (e) => {
     loadProducts(e.target.value);
   });
 
-  // Initial load
-  loadProducts("belts");
+  // Initial load: show all
+  loadProducts("all");
+
+  // Clear filters button logic
+  const clearBtn = document.getElementById("clearFiltersBtn");
+  clearBtn.addEventListener("click", () => {
+    // Reset category back to "All"
+    categorySelector.value = "all";
+
+    // Reload all products (from belts, wallets, bags)
+    loadProducts("all");
+
+    // Reset all attribute filter dropdowns (once rebuilt)
+    Object.values(filters).forEach((select) => {
+      select.value = "";
+    });
+  });
 });

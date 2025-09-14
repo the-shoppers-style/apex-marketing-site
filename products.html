@@ -31,7 +31,7 @@
         <!-- Filters Sidebar -->
         <aside class="col-md-3 mb-4 mb-md-0">
           <div id="filtersWrapper" class="card shadow-sm">
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
               <h5 class="card-title mb-3">Filters</h5>
 
               <!-- Category Selector -->
@@ -50,7 +50,15 @@
               <hr />
 
               <!-- Dynamic Filters will be injected here -->
-              <div id="filtersRow"></div>
+              <div id="filtersRow" class="flex-grow-1"></div>
+
+              <!-- Clear Filters Button -->
+              <button
+                id="clearFiltersBtn"
+                class="btn btn-outline-secondary mt-3"
+              >
+                Clear All Filters
+              </button>
             </div>
           </div>
         </aside>
