@@ -72,7 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     filtersRow.innerHTML = "";
     filters = {};
 
-    const attributes = ["type", "gender"];
+    // Order: Gender first, then Type
+    const attributes = ["gender", "type"];
 
     attributes.forEach((attr, index) => {
       const values = [...new Set(data.map((p) => p[attr]).filter(Boolean))];
@@ -81,22 +82,55 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.className = "mb-3";
 
         const label = document.createElement("label");
-        label.className = "form-label fw-semibold";
+        label.className = "form-label fw-semibold d-block mb-2";
         label.textContent = attr.charAt(0).toUpperCase() + attr.slice(1);
 
-        const select = document.createElement("select");
-        select.id = `filter${attr.charAt(0).toUpperCase() + attr.slice(1)}`;
-        select.className = "form-select";
-        select.innerHTML = `<option value="">All</option>`;
-
-        values.forEach((v) => {
-          select.innerHTML += `<option value="${v}">${v}</option>`;
-        });
-
-        select.addEventListener("change", filterProducts);
-
         wrapper.appendChild(label);
-        wrapper.appendChild(select);
+
+        if (attr === "gender") {
+          // Use radio buttons for Gender
+          const allId = `filterGenderAll`;
+          wrapper.innerHTML += `
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="filterGender" id="${allId}" value="" checked>
+              <label class="form-check-label" for="${allId}">All</label>
+            </div>
+          `;
+
+          values.forEach((v) => {
+            const id = `filterGender${v}`;
+            wrapper.innerHTML += `
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="filterGender" id="${id}" value="${v}">
+                <label class="form-check-label" for="${id}">${v}</label>
+              </div>
+            `;
+          });
+
+          // Listen for changes on gender radios
+          wrapper
+            .querySelectorAll("input[name='filterGender']")
+            .forEach((radio) => {
+              radio.addEventListener("change", filterProducts);
+            });
+
+          filters[attr] = wrapper.querySelector("input[name='filterGender']");
+        } else {
+          // Keep dropdown for Type
+          const select = document.createElement("select");
+          select.id = `filter${attr.charAt(0).toUpperCase() + attr.slice(1)}`;
+          select.className = "form-select";
+          select.innerHTML = `<option value="">All</option>`;
+
+          values.forEach((v) => {
+            select.innerHTML += `<option value="${v}">${v}</option>`;
+          });
+
+          select.addEventListener("change", filterProducts);
+
+          wrapper.appendChild(select);
+          filters[attr] = select;
+        }
 
         if (index < attributes.length - 1) {
           const hr = document.createElement("hr");
@@ -104,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         filtersRow.appendChild(wrapper);
-        filters[attr] = select;
       }
     });
   }
@@ -112,8 +145,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Filtering logic
   function filterProducts() {
     const selected = {};
-    Object.entries(filters).forEach(([key, select]) => {
-      selected[key] = select.value;
+
+    Object.entries(filters).forEach(([key, element]) => {
+      if (key === "gender") {
+        const checked = document.querySelector(
+          "input[name='filterGender']:checked"
+        );
+        selected[key] = checked ? checked.value : "";
+      } else {
+        selected[key] = element.value;
+      }
     });
 
     document.querySelectorAll(".product-card").forEach((card) => {
