@@ -136,16 +136,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Clear filters button logic
   const clearBtn = document.getElementById("clearFiltersBtn");
-  clearBtn.addEventListener("click", () => {
-    // Reset category back to "All"
-    categorySelector.value = "all";
+  clearBtn.addEventListener("click", async () => {
+    // Fade out the grid
+    productGrid.classList.add("fade-out");
 
-    // Reload all products (from belts, wallets, bags)
-    loadProducts("all");
+    setTimeout(async () => {
+      // Reset category back to "All"
+      categorySelector.value = "all";
 
-    // Reset all attribute filter dropdowns (once rebuilt)
-    Object.values(filters).forEach((select) => {
-      select.value = "";
-    });
+      // Reload all products (belts, wallets, bags)
+      await loadProducts("all");
+
+      // Reset all attribute filter dropdowns (after rebuild)
+      Object.values(filters).forEach((select) => {
+        select.value = "";
+      });
+
+      // Fade in after reload
+      productGrid.classList.remove("fade-out");
+      productGrid.classList.add("fade-in");
+
+      // Remove fade-in after animation completes
+      setTimeout(() => {
+        productGrid.classList.remove("fade-in");
+      }, 300);
+    }, 300);
   });
 });
