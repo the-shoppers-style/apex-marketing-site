@@ -25,77 +25,77 @@
       </div>
     </section>
 
-    <!-- Category Selector -->
-    <div class="container py-4 col-12 col-md-3">
-      <select id="categorySelector" class="form-select">
-        <option value="belts" selected>Belts</option>
-        <option value="wallets">Wallets</option>
-        <option value="bags">Bags</option>
-      </select>
-    </div>
-
-    <!-- Filters -->
     <section class="container py-4">
-      <!-- Filters will be injected here -->
-      <div id="filtersRow" class="row g-3 mb-4"></div>
-    </section>
+      <div class="row">
+        <!-- Filters Sidebar -->
+        <!-- Filters Sidebar -->
+        <aside class="col-md-3 mb-4 mb-md-0">
+          <div id="filtersWrapper" class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Filters</h5>
 
-    <!-- Product Grid -->
-    <section class="container py-4">
-      <div id="productGrid" class="row g-4"></div>
-
-      <!-- SEO & no-JS fallback -->
-      <noscript>
-        <div class="row g-4">
-          <div class="col-sm-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-              <img
-                src="assets/images/belt1.jpg"
-                class="card-img-top"
-                alt="Black Leather Belt"
-              />
-              <div class="card-body">
-                <h5 class="card-title">Black Leather Belt</h5>
-                <p class="card-text text-muted">
-                  Premium quality leather belt for men.
-                </p>
+              <!-- Category Selector -->
+              <div class="mb-3">
+                <label for="categorySelector" class="form-label fw-semibold"
+                  >Category</label
+                >
+                <select id="categorySelector" class="form-select">
+                  <option value="all" selected>All</option>
+                  <option value="belts">Belts</option>
+                  <option value="wallets">Wallets</option>
+                  <option value="bags">Bags</option>
+                </select>
               </div>
+
+              <hr />
+
+              <!-- Dynamic Filters will be injected here -->
+              <div id="filtersRow"></div>
             </div>
           </div>
+        </aside>
 
-          <div class="col-sm-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-              <img
-                src="assets/images/belt2.jpg"
-                class="card-img-top"
-                alt="Brown Synthetic Belt"
-              />
-              <div class="card-body">
-                <h5 class="card-title">Brown Synthetic Belt</h5>
-                <p class="card-text text-muted">
-                  Lightweight and stylish synthetic belt.
-                </p>
+        <!-- Product Grid -->
+        <div class="col-md-9">
+          <div id="productGrid" class="row g-4"></div>
+
+          <!-- SEO & no-JS fallback -->
+          <noscript>
+            <div class="row g-4">
+              <div class="col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                  <img
+                    src="assets/images/belt1.jpg"
+                    class="card-img-top"
+                    alt="Black Leather Belt"
+                  />
+                  <div class="card-body">
+                    <h5 class="card-title">Black Leather Belt</h5>
+                    <p class="card-text text-muted">
+                      Premium quality leather belt for men.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                  <img
+                    src="assets/images/belt2.jpg"
+                    class="card-img-top"
+                    alt="Brown Synthetic Belt"
+                  />
+                  <div class="card-body">
+                    <h5 class="card-title">Brown Synthetic Belt</h5>
+                    <p class="card-text text-muted">
+                      Lightweight and stylish synthetic belt.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="col-sm-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-              <img
-                src="assets/images/belt3.jpg"
-                class="card-img-top"
-                alt="Tan Artificial Belt"
-              />
-              <div class="card-body">
-                <h5 class="card-title">Tan Artificial Belt (Kids)</h5>
-                <p class="card-text text-muted">
-                  Durable belt designed for kids.
-                </p>
-              </div>
-            </div>
-          </div>
+          </noscript>
         </div>
-      </noscript>
+      </div>
     </section>
 
     <!-- Footer -->

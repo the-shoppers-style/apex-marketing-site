@@ -50,18 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const attributes = ["type", "size", "gender", "color"];
 
-    attributes.forEach((attr) => {
+    attributes.forEach((attr, index) => {
       const values = [...new Set(data.map((p) => p[attr]).filter(Boolean))];
       if (values.length > 0) {
-        const col = document.createElement("div");
-        col.className = "col-6 col-md-3";
+        const wrapper = document.createElement("div");
+        wrapper.className = "mb-3";
+
+        const label = document.createElement("label");
+        label.className = "form-label fw-semibold";
+        label.textContent = attr.charAt(0).toUpperCase() + attr.slice(1);
 
         const select = document.createElement("select");
         select.id = `filter${attr.charAt(0).toUpperCase() + attr.slice(1)}`;
         select.className = "form-select";
-        select.innerHTML = `<option value="">${
-          attr.charAt(0).toUpperCase() + attr.slice(1)
-        }</option>`;
+        select.innerHTML = `<option value="">All</option>`;
 
         values.forEach((v) => {
           select.innerHTML += `<option value="${v}">${
@@ -70,9 +72,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         select.addEventListener("change", filterProducts);
-        col.appendChild(select);
-        filtersRow.appendChild(col);
 
+        wrapper.appendChild(label);
+        wrapper.appendChild(select);
+
+        // Add <hr> before next filter except after last one
+        if (index < attributes.length - 1) {
+          const hr = document.createElement("hr");
+          wrapper.appendChild(hr);
+        }
+
+        filtersRow.appendChild(wrapper);
         filters[attr] = select;
       }
     });

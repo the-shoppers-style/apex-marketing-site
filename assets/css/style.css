@@ -1,3 +1,13 @@
 body {
   padding-top: 70px; /* adjust depending on navbar height */
 }
+
+/* Make the entire filter column sticky */
+@media (min-width: 768px) {
+  aside.col-md-3 {
+    position: sticky;
+    top: 80px; /* match navbar height */
+    align-self: flex-start; /* ensures proper sticky alignment in Bootstrap grid */
+    height: fit-content; /* ensures it doesn't stretch */
+  }
+}
