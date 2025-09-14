@@ -3,30 +3,30 @@
     "title": "Classic Leather Wallet",
     "description": "Slim, durable leather wallet with multiple card slots.",
     "image": "assets/images/wallet1.jpg",
-    "type": "leather",
-    "size": "small",
-    "gender": "male",
-    "color": "black",
-    "category": "wallets"
+    "type": "Leather",
+    "size": "Small",
+    "gender": "Men",
+    "color": "Black",
+    "category": "Wallets"
   },
   {
     "title": "Ladies Clutch Wallet",
     "description": "Elegant clutch wallet for women with zipper compartment.",
     "image": "assets/images/wallet2.jpg",
-    "type": "leather",
-    "size": "medium",
-    "gender": "female",
-    "color": "brown",
-    "category": "wallets"
+    "type": "Leather",
+    "size": "Medium",
+    "gender": "Women",
+    "color": "Brown",
+    "category": "Wallets"
   },
   {
     "title": "Kids Mini Wallet",
     "description": "Compact wallet designed for kids to carry essentials.",
     "image": "assets/images/wallet3.jpg",
-    "type": "synthetic",
-    "size": "small",
-    "gender": "kids",
-    "color": "blue",
-    "category": "wallets"
+    "type": "Synthetic",
+    "size": "Small",
+    "gender": "Kids",
+    "color": "Blue",
+    "category": "Wallets"
   }
 ]

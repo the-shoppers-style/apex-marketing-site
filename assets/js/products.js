@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     filtersRow.innerHTML = "";
     filters = {};
 
-    const attributes = ["type", "size", "gender", "color"];
+    const attributes = ["type", "gender"];
 
     attributes.forEach((attr, index) => {
       const values = [...new Set(data.map((p) => p[attr]).filter(Boolean))];
@@ -90,9 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         select.innerHTML = `<option value="">All</option>`;
 
         values.forEach((v) => {
-          select.innerHTML += `<option value="${v}">${
-            v.charAt(0).toUpperCase() + v.slice(1)
-          }</option>`;
+          select.innerHTML += `<option value="${v}">${v}</option>`;
         });
 
         select.addEventListener("change", filterProducts);
