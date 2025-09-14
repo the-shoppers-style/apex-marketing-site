@@ -116,12 +116,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (attr === "type") {
+          const counts = {};
+          values.forEach((v) => {
+            counts[v] = data.filter((p) => p[attr] === v).length;
+          });
+
           values.forEach((v) => {
             const id = `filterType${v}`;
             wrapper.innerHTML += `
-              <div class="form-check">
-                <input class="form-check-input filter-type" type="checkbox" name="filterType" id="${id}" value="${v}">
-                <label class="form-check-label" for="${id}">${v}</label>
+              <div class="form-check d-flex justify-content-between align-items-center">
+                <div>
+                  <input class="form-check-input filter-type" type="checkbox" name="filterType" id="${id}" value="${v}">
+                  <label class="form-check-label ms-1" for="${id}">${v}</label>
+                </div>
+                <span class="badge bg-secondary rounded-pill type-count" data-type="${v}">${counts[v]}</span>
               </div>
             `;
           });
@@ -160,17 +168,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const checkedBoxes = Array.from(
           document.querySelectorAll("input[name='filterType']:checked")
         );
-        selected[key] = checkedBoxes.map((cb) => cb.value); // array of selected types
+        selected[key] = checkedBoxes.map((cb) => cb.value);
       }
     });
 
-    document.querySelectorAll(".product-card").forEach((card) => {
+    // Apply filtering to products
+    const allCards = document.querySelectorAll(".product-card");
+    allCards.forEach((card) => {
       const matches = Object.entries(selected).every(([key, value]) => {
         if (!value || (Array.isArray(value) && value.length === 0)) return true;
         if (Array.isArray(value)) return value.includes(card.dataset[key]);
         return card.dataset[key] === value;
       });
       card.style.display = matches ? "block" : "none";
+    });
+
+    // 🔥 Update Type counts live
+    const typeCounts = {};
+    allCards.forEach((card) => {
+      if (card.style.display !== "none") {
+        const type = card.dataset.type;
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+      }
+    });
+
+    document.querySelectorAll(".type-count").forEach((badge) => {
+      const type = badge.dataset.type;
+      badge.textContent = typeCounts[type] || 0;
     });
   }
 
