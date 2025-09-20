@@ -36,9 +36,13 @@ function applyFilters(selected) {
   allCards.forEach((card) => {
     const matches = Object.entries(selected).every(([key, value]) => {
       if (!value || (Array.isArray(value) && value.length === 0)) return true;
+
+      if (key === "category" && value === "all") return true;
+
       if (Array.isArray(value)) return value.includes(card.dataset[key]);
       return card.dataset[key] === value;
     });
+
     card.style.display = matches ? "block" : "none";
   });
 
@@ -76,10 +80,119 @@ async function loadProducts(category = "all") {
 
   renderProducts(allProducts);
 
-  // Build filters only for desktop for now
-  if (typeof buildDesktopFilters === "function") {
-    buildDesktopFilters(allProducts);
+  // Build filters first
+  buildFiltersForViewport(allProducts);
+
+  // Now apply filters (either saved or default "all")
+  if (
+    lastSelectedFilters &&
+    (lastSelectedFilters.gender ||
+      lastSelectedFilters.materials.length ||
+      lastSelectedFilters.category !== "all")
+  ) {
+    reapplyFilters();
+  } else {
+    applyFilters({ gender: "", materials: [], category: "all" });
   }
 }
 
-loadProducts();
+let currentFilterMode = null;
+let lastSelectedFilters = { gender: "", materials: [], category: "all" };
+
+// Helper: collect active filters from DOM
+function collectActiveFilters() {
+  const gender = document.querySelector("input[name='filterGender']:checked");
+  const materials = Array.from(
+    document.querySelectorAll("input[name='filterMaterials']:checked")
+  );
+  const category = document.getElementById("categorySelector");
+
+  lastSelectedFilters = {
+    gender: gender ? gender.value : "",
+    materials: materials.map((cb) => cb.value),
+    category: category ? category.value : "all",
+  };
+}
+
+// Helper: reapply saved filters into new UI
+function reapplyFilters() {
+  // Gender
+  if (lastSelectedFilters.gender !== "") {
+    const genderRadio = document.querySelector(
+      `input[name='filterGender'][value='${lastSelectedFilters.gender}']`
+    );
+    if (genderRadio) genderRadio.checked = true;
+  } else {
+    const allRadio = document.querySelector("#filterGenderAll");
+    if (allRadio) allRadio.checked = true;
+  }
+
+  // Materials
+  if (lastSelectedFilters.materials.length > 0) {
+    lastSelectedFilters.materials.forEach((v) => {
+      const matCb = document.querySelector(
+        `input[name='filterMaterials'][value='${v}']`
+      );
+      if (matCb) matCb.checked = true;
+    });
+  }
+
+  // Category
+  const catSelector = document.getElementById("categorySelector");
+  if (catSelector && lastSelectedFilters.category) {
+    catSelector.value = lastSelectedFilters.category;
+  }
+
+  // Apply them
+  applyFilters(lastSelectedFilters);
+}
+
+// Choose mobile or desktop filters
+function buildFiltersForViewport(data) {
+  if (window.innerWidth < 768 && typeof buildMobileFilters === "function") {
+    if (currentFilterMode !== "mobile") {
+      collectActiveFilters();
+      currentFilterMode = "mobile";
+      buildMobileFilters(data);
+      reapplyFilters();
+    }
+  } else if (typeof buildDesktopFilters === "function") {
+    if (currentFilterMode !== "desktop") {
+      collectActiveFilters();
+      currentFilterMode = "desktop";
+      buildDesktopFilters(data);
+      reapplyFilters();
+    }
+  }
+}
+
+// Resize listener
+window.addEventListener("resize", () => {
+  const cards = Array.from(document.querySelectorAll(".product-card")).map(
+    (card) => ({
+      title: card.querySelector(".card-title").textContent,
+      description: card.querySelector(".card-text").textContent,
+      image: card.querySelector("img").src,
+      category: card.dataset.category,
+      gender: card.dataset.gender,
+      materials: card.dataset.materials,
+    })
+  );
+  buildFiltersForViewport(cards);
+});
+
+function waitFor(fnName, cb, timeout = 3000) {
+  const start = Date.now();
+  (function check() {
+    if (typeof window[fnName] === "function") return cb();
+    if (Date.now() - start > timeout) return cb(); // fallback after timeout
+    setTimeout(check, 30);
+  })();
+}
+
+// Wait for the desktop filter builder to be defined (if present), then load
+waitFor("buildDesktopFilters", () => {
+  loadProducts(); // initial load once builder is available (or timeout)
+});
+
+document.getElementById("productGrid").style.visibility = "visible";
