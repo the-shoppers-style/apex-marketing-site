@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach((product) => {
       const card = document.createElement("div");
       card.className = "col-sm-6 col-lg-4 product-card";
-      card.dataset.type = product.type || "";
+      card.dataset.materials = product.materials || "";
       card.dataset.size = product.size || "";
       card.dataset.gender = product.gender || "";
       card.dataset.color = product.color || "";
@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     filtersRow.innerHTML = "";
     filters = {};
 
-    // Explicit order: Gender first, then Type
-    const attributes = ["gender", "type"];
+    // Explicit order: Gender first, then Materials
+    const attributes = ["gender", "materials"];
 
     attributes.forEach((attr, index) => {
       const values = [...new Set(data.map((p) => p[attr]).filter(Boolean))];
@@ -115,33 +115,33 @@ document.addEventListener("DOMContentLoaded", () => {
           filters[attr] = wrapper.querySelector("input[name='filterGender']");
         }
 
-        if (attr === "type") {
+        if (attr === "materials") {
           const counts = {};
           values.forEach((v) => {
             counts[v] = data.filter((p) => p[attr] === v).length;
           });
 
           values.forEach((v) => {
-            const id = `filterType${v}`;
+            const id = `filterMaterials${v}`;
             wrapper.innerHTML += `
               <div class="form-check d-flex justify-content-between align-items-center">
                 <div>
-                  <input class="form-check-input filter-type" type="checkbox" name="filterType" id="${id}" value="${v}">
+                  <input class="form-check-input filter-materials" type="checkbox" name="filterMaterials" id="${id}" value="${v}">
                   <label class="form-check-label ms-1" for="${id}">${v}</label>
                 </div>
-                <span class="badge bg-secondary rounded-pill type-count" data-type="${v}">${counts[v]}</span>
+                <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${counts[v]}</span>
               </div>
             `;
           });
 
-          const typeCheckboxes = wrapper.querySelectorAll(".filter-type");
+          const materialsCheckboxes =
+            wrapper.querySelectorAll(".filter-materials");
 
-          // Hook change events
-          typeCheckboxes.forEach((cb) => {
+          materialsCheckboxes.forEach((cb) => {
             cb.addEventListener("change", filterProducts);
           });
 
-          filters[attr] = typeCheckboxes;
+          filters[attr] = materialsCheckboxes;
         }
 
         if (index < attributes.length - 1) {
@@ -164,9 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
           "input[name='filterGender']:checked"
         );
         selected[key] = checked ? checked.value : "";
-      } else if (key === "type") {
+      } else if (key === "materials") {
         const checkedBoxes = Array.from(
-          document.querySelectorAll("input[name='filterType']:checked")
+          document.querySelectorAll("input[name='filterMaterials']:checked")
         );
         selected[key] = checkedBoxes.map((cb) => cb.value);
       }
@@ -183,18 +183,18 @@ document.addEventListener("DOMContentLoaded", () => {
       card.style.display = matches ? "block" : "none";
     });
 
-    // 🔥 Update Type counts live
-    const typeCounts = {};
+    // 🔥 Update Materials counts live
+    const materialsCounts = {};
     allCards.forEach((card) => {
       if (card.style.display !== "none") {
-        const type = card.dataset.type;
-        typeCounts[type] = (typeCounts[type] || 0) + 1;
+        const materials = card.dataset.materials;
+        materialsCounts[materials] = (materialsCounts[materials] || 0) + 1;
       }
     });
 
-    document.querySelectorAll(".type-count").forEach((badge) => {
-      const type = badge.dataset.type;
-      badge.textContent = typeCounts[type] || 0;
+    document.querySelectorAll(".materials-count").forEach((badge) => {
+      const materials = badge.dataset.materials;
+      badge.textContent = materialsCounts[materials] || 0;
     });
   }
 
