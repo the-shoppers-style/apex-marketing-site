@@ -70,10 +70,25 @@ function applyFilters(selected) {
     noProductsMessage.style.display = "none";
   }
 
-  // Update live counts for Materials
+  // Update live counts for Materials based on Gender + Category only (not materials filter)
   const materialsCounts = {};
   allCards.forEach((card) => {
-    if (card.style.display !== "none") {
+    // Check if card matches Gender and Category filters only
+    const matchesGenderAndCategory = Object.entries(selected).every(
+      ([key, value]) => {
+        // Skip materials filter for count calculation
+        if (key === "materials") return true;
+
+        if (!value || (Array.isArray(value) && value.length === 0)) return true;
+        if (key === "category" && value === "all") return true;
+
+        if (Array.isArray(value)) return value.includes(card.dataset[key]);
+        return card.dataset[key] === value;
+      }
+    );
+
+    // Only count if it matches gender and category filters
+    if (matchesGenderAndCategory) {
       const mat = card.dataset.materials;
       materialsCounts[mat] = (materialsCounts[mat] || 0) + 1;
     }
