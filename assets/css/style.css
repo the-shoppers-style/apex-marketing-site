@@ -22,3 +22,8 @@ body {
   opacity: 1;
   transition: opacity 0.3s ease-in;
 }
+
+/* Prevent layout shifts during filter operations */
+#productGrid {
+  min-height: 200px; /* Ensure minimum height to reduce layout shifts */
+}

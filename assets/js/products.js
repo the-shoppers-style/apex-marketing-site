@@ -6,25 +6,39 @@ const productGrid = document.getElementById("productGrid");
 
 // Render product cards
 function renderProducts(products) {
-  productGrid.innerHTML = "";
-  products.forEach((product) => {
-    const card = document.createElement("div");
-    card.className = "col-md-4 mb-4 product-card";
-    card.dataset.category = product.category || "";
-    card.dataset.gender = product.gender || "";
-    card.dataset.materials = product.materials || "";
+  const noProductsMessage = document.getElementById("noProductsMessage");
 
-    card.innerHTML = `
-      <div class="card h-100">
-        <img src="${product.image}" class="card-img-top" alt="${product.title}">
-        <div class="card-body">
-          <h5 class="card-title">${product.title}</h5>
-          <p class="card-text">${product.description}</p>
+  // Remove existing product cards (but keep the no products message)
+  const existingCards = productGrid.querySelectorAll(".product-card");
+  existingCards.forEach((card) => card.remove());
+
+  if (products.length === 0) {
+    // Show no products message
+    noProductsMessage.style.display = "block";
+  } else {
+    // Hide no products message
+    noProductsMessage.style.display = "none";
+
+    // Add product cards
+    products.forEach((product) => {
+      const card = document.createElement("div");
+      card.className = "col-md-4 mb-4 product-card";
+      card.dataset.category = product.category || "";
+      card.dataset.gender = product.gender || "";
+      card.dataset.materials = product.materials || "";
+
+      card.innerHTML = `
+        <div class="card h-100">
+          <img src="${product.image}" class="card-img-top" alt="${product.title}">
+          <div class="card-body">
+            <h5 class="card-title">${product.title}</h5>
+            <p class="card-text">${product.description}</p>
+          </div>
         </div>
-      </div>
-    `;
-    productGrid.appendChild(card);
-  });
+      `;
+      productGrid.appendChild(card);
+    });
+  }
 }
 
 // ======================
@@ -32,6 +46,8 @@ function renderProducts(products) {
 // ======================
 function applyFilters(selected) {
   const allCards = document.querySelectorAll(".product-card");
+  const noProductsMessage = document.getElementById("noProductsMessage");
+  let visibleCount = 0;
 
   allCards.forEach((card) => {
     const matches = Object.entries(selected).every(([key, value]) => {
@@ -44,7 +60,15 @@ function applyFilters(selected) {
     });
 
     card.style.display = matches ? "block" : "none";
+    if (matches) visibleCount++;
   });
+
+  // Show/hide no products message based on visible products
+  if (visibleCount === 0) {
+    noProductsMessage.style.display = "block";
+  } else {
+    noProductsMessage.style.display = "none";
+  }
 
   // Update live counts for Materials
   const materialsCounts = {};
@@ -78,12 +102,13 @@ async function loadProducts(category = "all") {
     }
   }
 
+  // Render products without scroll preservation first
   renderProducts(allProducts);
 
-  // Build filters first
+  // Build filters without scroll preservation
   buildFiltersForViewport(allProducts);
 
-  // Now apply filters (either saved or default "all")
+  // Apply filters without scroll preservation
   if (
     lastSelectedFilters &&
     (lastSelectedFilters.gender ||
@@ -178,6 +203,7 @@ window.addEventListener("resize", () => {
       materials: card.dataset.materials,
     })
   );
+
   buildFiltersForViewport(cards);
 });
 
@@ -193,6 +219,35 @@ function waitFor(fnName, cb, timeout = 3000) {
 // Wait for the desktop filter builder to be defined (if present), then load
 waitFor("buildDesktopFilters", () => {
   loadProducts(); // initial load once builder is available (or timeout)
+  // Add Clear Filters button functionality
+  const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", () => {
+      // Reset category selector
+      const categorySelector = document.getElementById("categorySelector");
+      if (categorySelector) {
+        categorySelector.value = "all";
+      }
+
+      // Reset gender filters
+      const genderAllRadio = document.querySelector("#filterGenderAll");
+      if (genderAllRadio) {
+        genderAllRadio.checked = true;
+      }
+
+      // Reset materials filters
+      const materialCheckboxes = document.querySelectorAll(
+        "input[name='filterMaterials']:checked"
+      );
+      materialCheckboxes.forEach((cb) => (cb.checked = false));
+
+      // Reset stored filters
+      lastSelectedFilters = { gender: "", materials: [], category: "all" };
+
+      // Apply cleared filters
+      applyFilters(lastSelectedFilters);
+    });
+  }
 });
 
 document.getElementById("productGrid").style.visibility = "visible";

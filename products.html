@@ -62,10 +62,23 @@
             </div>
           </div>
         </aside>
-
         <!-- Product Grid -->
         <div class="col-md-9">
-          <div id="productGrid" class="row g-4"></div>
+          <div id="productGrid" class="row g-4">
+            <!-- No products message - always present as DOM anchor -->
+            <div
+              id="noProductsMessage"
+              class="col-12 text-center py-5"
+              style="display: none"
+            >
+              <div class="alert alert-info">
+                <h5>No products found</h5>
+                <p class="mb-0">
+                  Try adjusting your filters to see more products.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <!-- SEO & no-JS fallback -->
           <noscript>
