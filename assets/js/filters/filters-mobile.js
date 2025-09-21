@@ -19,7 +19,6 @@ function buildMobileFilters(data) {
     </div>
 
     <!-- Off-canvas Panel -->
-    // New line with auto-height and a max-height
     <div class="offcanvas offcanvas-bottom d-md-none" tabindex="-1" id="mobileFiltersOffcanvas" aria-labelledby="mobileFiltersOffcanvasLabel" style="height: auto; max-height: 80vh;">
       <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title" id="mobileFiltersOffcanvasLabel">Filters</h5>

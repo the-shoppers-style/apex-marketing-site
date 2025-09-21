@@ -65,7 +65,16 @@ function applyFilters(selected) {
     const matches = Object.entries(selected).every(([key, value]) => {
       if (!value || (Array.isArray(value) && value.length === 0)) return true;
 
-      if (key === "category" && value === "all") return true;
+      // Skip category filter if products are already pre-filtered by category loading
+      if (key === "category") {
+        // Only apply category filter if we loaded "all" categories
+        if (lastSelectedFilters.category === "all") {
+          return value === "all" || card.dataset[key] === value;
+        } else {
+          // Products are already filtered by category during loading, so ignore category filter
+          return true;
+        }
+      }
 
       if (Array.isArray(value)) return value.includes(card.dataset[key]);
       return card.dataset[key] === value;
@@ -76,25 +85,16 @@ function applyFilters(selected) {
   });
 
   noProductsMessage.style.display = visibleCount === 0 ? "block" : "none";
-
   const materialsCounts = {};
   allCards.forEach((card) => {
-    // Check if card matches Gender and Category filters only
-    const matchesGenderAndCategory = Object.entries(selected).every(
-      ([key, value]) => {
-        // Skip materials filter for count calculation
-        if (key === "materials") return true;
+    // For materials count, only filter by gender (since products are already pre-filtered by category during loading)
+    const matchesGender =
+      !selected.gender ||
+      selected.gender === "" ||
+      card.dataset.gender === selected.gender;
 
-        if (!value || (Array.isArray(value) && value.length === 0)) return true;
-        if (key === "category" && value === "all") return true;
-
-        if (Array.isArray(value)) return value.includes(card.dataset[key]);
-        return card.dataset[key] === value;
-      }
-    );
-
-    // Only count if it matches gender and category filters
-    if (matchesGenderAndCategory) {
+    // Only count if it matches gender filter
+    if (matchesGender) {
       const mat = card.dataset.materials;
       materialsCounts[mat] = (materialsCounts[mat] || 0) + 1;
     }
@@ -154,7 +154,6 @@ function collectActiveFilters() {
     category = document.querySelector(
       "#mobileFiltersOffcanvas input[name='mobileCategory']:checked"
     );
-
     lastSelectedFilters.gender = gender ? gender.value : "";
     lastSelectedFilters.materials = materials.map((cb) => cb.value);
     lastSelectedFilters.category = category ? category.value : "all";
@@ -168,7 +167,6 @@ function collectActiveFilters() {
       )
     );
     const categorySelector = document.getElementById("categorySelector");
-
     lastSelectedFilters.gender = gender ? gender.value : "";
     lastSelectedFilters.materials = materials.map((cb) => cb.value);
     lastSelectedFilters.category = categorySelector
