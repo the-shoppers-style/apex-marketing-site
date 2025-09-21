@@ -101,15 +101,24 @@ function buildMobileFilters(data) {
     `;
   });
   genderPane.innerHTML = genderHTML;
-
   // Materials
   const materials = [...new Set(data.map((p) => p.materials).filter(Boolean))];
+
+  // Calculate initial counts for materials
+  const materialsCounts = {};
+  materials.forEach((v) => {
+    materialsCounts[v] = data.filter((p) => p.materials === v).length;
+  });
+
   let materialsHTML = "";
   materials.forEach((v) => {
     materialsHTML += `
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="filterMaterials" id="mobileFilterMaterials${v}" value="${v}">
-        <label class="form-check-label" for="mobileFilterMaterials${v}">${v}</label>
+      <div class="form-check d-flex justify-content-between align-items-center">
+        <div>
+          <input class="form-check-input" type="checkbox" name="filterMaterials" id="mobileFilterMaterials${v}" value="${v}">
+          <label class="form-check-label ms-1" for="mobileFilterMaterials${v}">${v}</label>
+        </div>
+        <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${materialsCounts[v]}</span>
       </div>
     `;
   });
