@@ -93,24 +93,14 @@ function buildDesktopFilters(data) {
   }
 
   // Initial apply
-  collectFilters();
 }
 
 // Collect current filter selections and apply
 function collectFilters() {
-  const selected = {};
+  // Use the global function to update lastSelectedFilters from the desktop UI.
+  // This ensures the application's state is always current.
+  collectActiveFilters();
 
-  // Gender
-  const checkedGender = document.querySelector(
-    "input[name='filterGender']:checked"
-  );
-  selected.gender = checkedGender ? checkedGender.value : "";
-
-  // Materials
-  const checkedMaterials = Array.from(
-    document.querySelectorAll("input[name='filterMaterials']:checked")
-  );
-  selected.materials = checkedMaterials.map((cb) => cb.value);
-
-  applyFilters(selected);
+  // Now, apply the filters using that centrally-managed state.
+  applyFilters(lastSelectedFilters);
 }

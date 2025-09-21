@@ -1,22 +1,34 @@
 // ======================
-// Core product rendering
+// Global State Management
 // ======================
 
+// *** FIX #1: Create a reliable, global "source of truth" for the product list. ***
+// This will hold all products for the currently selected category.
+let _allProducts = [];
+
+// *** FIX #2: Use sessionStorage to persist filters across page reloads. ***
+let lastSelectedFilters = JSON.parse(
+  sessionStorage.getItem("lastSelectedFilters")
+) || {
+  gender: "",
+  materials: [],
+  category: "all",
+};
+
+let currentFilterMode = null;
 const productGrid = document.getElementById("productGrid");
 
-// Render product cards
+// ======================
+// Core product rendering
+// ======================
 function renderProducts(products) {
   const noProductsMessage = document.getElementById("noProductsMessage");
-
-  // Remove existing product cards (but keep the no products message)
-  const existingCards = productGrid.querySelectorAll(".product-card");
-  existingCards.forEach((card) => card.remove());
+  productGrid.innerHTML = ""; // Clear grid but keep the message anchor
+  productGrid.appendChild(noProductsMessage);
 
   if (products.length === 0) {
-    // Show no products message
     noProductsMessage.style.display = "block";
   } else {
-    // Hide no products message
     noProductsMessage.style.display = "none";
 
     // Add product cards
@@ -63,14 +75,8 @@ function applyFilters(selected) {
     if (matches) visibleCount++;
   });
 
-  // Show/hide no products message based on visible products
-  if (visibleCount === 0) {
-    noProductsMessage.style.display = "block";
-  } else {
-    noProductsMessage.style.display = "none";
-  }
+  noProductsMessage.style.display = visibleCount === 0 ? "block" : "none";
 
-  // Update live counts for Materials based on Gender + Category only (not materials filter)
   const materialsCounts = {};
   allCards.forEach((card) => {
     // Check if card matches Gender and Category filters only
@@ -99,111 +105,153 @@ function applyFilters(selected) {
     badge.textContent = materialsCounts[mat] || 0;
   });
 
-  // Smooth scroll to top of page when filters are applied
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // ======================
 // Product Loader
 // ======================
 async function loadProducts(category = "all") {
+  lastSelectedFilters.category = category; // Update category in state
   const files = category === "all" ? ["belts", "wallets", "bags"] : [category];
-  let allProducts = [];
+  let loadedProducts = [];
 
   for (const file of files) {
     try {
       const res = await fetch(`assets/data/${file}.json`);
       const data = await res.json();
-      allProducts = allProducts.concat(data);
+      loadedProducts = loadedProducts.concat(data);
     } catch (e) {
       console.warn(`Could not load ${file}.json`);
     }
   }
-  // Render products
-  renderProducts(allProducts);
 
-  // Build filters for current viewport
-  buildFiltersForViewport(allProducts);
+  // *** Update the global "source of truth" for products ***
+  _allProducts = loadedProducts;
 
-  // Apply filters with scrolling
-  if (
-    lastSelectedFilters &&
-    (lastSelectedFilters.gender ||
-      lastSelectedFilters.materials.length ||
-      lastSelectedFilters.category !== "all")
-  ) {
-    reapplyFilters();
-  } else {
-    applyFilters({ gender: "", materials: [], category: "all" });
-  }
+  renderProducts(_allProducts);
+  buildFiltersForViewport(_allProducts);
+  reapplyFilters();
 }
 
-let currentFilterMode = null;
-let lastSelectedFilters = { gender: "", materials: [], category: "all" };
+// ======================
+// State and UI Sync
+// ======================
 
-// Helper: collect active filters from DOM
+// Helper: Collects filters from the DOM and saves the state.
 function collectActiveFilters() {
-  const gender = document.querySelector("input[name='filterGender']:checked");
-  const materials = Array.from(
-    document.querySelectorAll("input[name='filterMaterials']:checked")
-  );
-  const category = document.getElementById("categorySelector");
+  let gender, materials, category;
 
-  lastSelectedFilters = {
-    gender: gender ? gender.value : "",
-    materials: materials.map((cb) => cb.value),
-    category: category ? category.value : "all",
-  };
-}
-
-// Helper: reapply saved filters into new UI
-function reapplyFilters() {
-  // Gender
-  if (lastSelectedFilters.gender !== "") {
-    const genderRadio = document.querySelector(
-      `input[name='filterGender'][value='${lastSelectedFilters.gender}']`
+  if (currentFilterMode === "mobile") {
+    gender = document.querySelector(
+      "#mobileFiltersOffcanvas input[name='filterGender']:checked"
     );
-    if (genderRadio) genderRadio.checked = true;
+    materials = Array.from(
+      document.querySelectorAll(
+        "#mobileFiltersOffcanvas input[name='filterMaterials']:checked"
+      )
+    );
+    category = document.querySelector(
+      "#mobileFiltersOffcanvas input[name='mobileCategory']:checked"
+    );
+
+    lastSelectedFilters.gender = gender ? gender.value : "";
+    lastSelectedFilters.materials = materials.map((cb) => cb.value);
+    lastSelectedFilters.category = category ? category.value : "all";
   } else {
-    const allRadio = document.querySelector("#filterGenderAll");
-    if (allRadio) allRadio.checked = true;
+    gender = document.querySelector(
+      "#filtersWrapper input[name='filterGender']:checked"
+    );
+    materials = Array.from(
+      document.querySelectorAll(
+        "#filtersWrapper input[name='filterMaterials']:checked"
+      )
+    );
+    const categorySelector = document.getElementById("categorySelector");
+
+    lastSelectedFilters.gender = gender ? gender.value : "";
+    lastSelectedFilters.materials = materials.map((cb) => cb.value);
+    lastSelectedFilters.category = categorySelector
+      ? categorySelector.value
+      : "all";
   }
 
-  // Materials
-  if (lastSelectedFilters.materials.length > 0) {
+  // *** Save the updated state to sessionStorage ***
+  sessionStorage.setItem(
+    "lastSelectedFilters",
+    JSON.stringify(lastSelectedFilters)
+  );
+}
+
+// Helper: Applies the saved `lastSelectedFilters` state to the current UI.
+function reapplyFilters() {
+  if (currentFilterMode === "mobile") {
+    const genderRadioMobile = document.querySelector(
+      `#mobileFiltersOffcanvas input[name='filterGender'][value='${
+        lastSelectedFilters.gender || ""
+      }']`
+    );
+    if (genderRadioMobile) genderRadioMobile.checked = true;
+
+    document
+      .querySelectorAll("#mobileFiltersOffcanvas input[name='filterMaterials']")
+      .forEach((cb) => (cb.checked = false));
     lastSelectedFilters.materials.forEach((v) => {
       const matCb = document.querySelector(
-        `input[name='filterMaterials'][value='${v}']`
+        `#mobileFiltersOffcanvas input[name='filterMaterials'][value='${v}']`
       );
       if (matCb) matCb.checked = true;
     });
-  }
 
-  // Category
-  const catSelector = document.getElementById("categorySelector");
-  if (catSelector && lastSelectedFilters.category) {
-    catSelector.value = lastSelectedFilters.category;
-  }
+    const categoryRadioMobile = document.querySelector(
+      `#mobileFiltersOffcanvas input[name='mobileCategory'][value='${
+        lastSelectedFilters.category || "all"
+      }']`
+    );
+    if (categoryRadioMobile) categoryRadioMobile.checked = true;
+  } else {
+    const genderRadioDesktop = document.querySelector(
+      `#filtersWrapper input[name='filterGender'][value='${
+        lastSelectedFilters.gender || ""
+      }']`
+    );
+    if (genderRadioDesktop) genderRadioDesktop.checked = true;
 
-  // Apply them
+    document
+      .querySelectorAll("#filtersWrapper input[name='filterMaterials']")
+      .forEach((cb) => (cb.checked = false));
+    lastSelectedFilters.materials.forEach((v) => {
+      const matCb = document.querySelector(
+        `#filtersWrapper input[name='filterMaterials'][value='${v}']`
+      );
+      if (matCb) matCb.checked = true;
+    });
+
+    const catSelector = document.getElementById("categorySelector");
+    if (catSelector) catSelector.value = lastSelectedFilters.category;
+  }
   applyFilters(lastSelectedFilters);
 }
 
-// Choose mobile or desktop filters
+// Decides which filter UI to build and manages the transition.
 function buildFiltersForViewport(data) {
+  const mobileTrigger = document.getElementById("mobileFilterTrigger");
+  const mobileOffcanvas = document.getElementById("mobileFiltersOffcanvas");
+
   if (window.innerWidth < 768 && typeof buildMobileFilters === "function") {
     if (currentFilterMode !== "mobile") {
-      collectActiveFilters();
+      collectActiveFilters(); // Save state from desktop before switching
       currentFilterMode = "mobile";
       buildMobileFilters(data);
       reapplyFilters();
     }
   } else if (typeof buildDesktopFilters === "function") {
     if (currentFilterMode !== "desktop") {
-      collectActiveFilters();
+      collectActiveFilters(); // Save state from mobile before switching
+
+      if (mobileTrigger) mobileTrigger.remove();
+      if (mobileOffcanvas) mobileOffcanvas.remove();
+
       currentFilterMode = "desktop";
       buildDesktopFilters(data);
       reapplyFilters();
@@ -211,72 +259,44 @@ function buildFiltersForViewport(data) {
   }
 }
 
-// Resize listener
+// *** FIX #3: The resize handler is now simple and reliable. ***
+// It no longer scrapes the DOM. It uses the `_allProducts` source of truth.
 window.addEventListener("resize", () => {
-  const cards = Array.from(document.querySelectorAll(".product-card")).map(
-    (card) => ({
-      title: card.querySelector(".card-title").textContent,
-      description: card.querySelector(".card-text").textContent,
-      image: card.querySelector("img").src,
-      category: card.dataset.category,
-      gender: card.dataset.gender,
-      materials: card.dataset.materials,
-    })
-  );
-
-  buildFiltersForViewport(cards);
+  if (_allProducts.length > 0) {
+    buildFiltersForViewport(_allProducts);
+  }
 });
 
 function waitFor(fnName, cb, timeout = 3000) {
   const start = Date.now();
   (function check() {
     if (typeof window[fnName] === "function") return cb();
-    if (Date.now() - start > timeout) return cb(); // fallback after timeout
+    if (Date.now() - start > timeout) return cb();
     setTimeout(check, 30);
   })();
 }
 
-// Wait for the desktop filter builder to be defined (if present), then load
+// Initial page load
 waitFor("buildDesktopFilters", () => {
-  loadProducts(); // initial load once builder is available (or timeout)
-  // Add Clear Filters button functionality
+  // Load products based on the category saved in sessionStorage (or 'all')
+  loadProducts(lastSelectedFilters.category);
+
   const clearFiltersBtn = document.getElementById("clearFiltersBtn");
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", () => {
-      // Reset category selector
-      const categorySelector = document.getElementById("categorySelector");
-      if (categorySelector) {
-        categorySelector.value = "all";
-      }
-
-      // Reset gender filters
-      const genderAllRadio = document.querySelector("#filterGenderAll");
-      if (genderAllRadio) {
-        genderAllRadio.checked = true;
-      }
-
-      // Reset materials filters
-      const materialCheckboxes = document.querySelectorAll(
-        "input[name='filterMaterials']:checked"
-      );
-      materialCheckboxes.forEach((cb) => (cb.checked = false)); // Reset stored filters
+      // Reset the central state object
       lastSelectedFilters = { gender: "", materials: [], category: "all" };
 
-      // Add fade animation during filter clearing
+      // *** Clear the state from sessionStorage ***
+      sessionStorage.removeItem("lastSelectedFilters");
+
+      // Reload products with the 'all' category and apply cleared filters
+      loadProducts("all");
+
+      // Animate the change
       productGrid.classList.add("fade-out");
-
       setTimeout(() => {
-        // Apply cleared filters
-        applyFilters(lastSelectedFilters);
-
-        // Fade back in
         productGrid.classList.remove("fade-out");
-        productGrid.classList.add("fade-in");
-
-        // Clean up fade-in class after animation
-        setTimeout(() => {
-          productGrid.classList.remove("fade-in");
-        }, 300);
       }, 150);
     });
   }
