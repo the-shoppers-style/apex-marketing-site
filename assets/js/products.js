@@ -83,6 +83,12 @@ function applyFilters(selected) {
     const mat = badge.dataset.materials;
     badge.textContent = materialsCounts[mat] || 0;
   });
+
+  // Smooth scroll to top of page when filters are applied
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 }
 
 // ======================
@@ -101,14 +107,13 @@ async function loadProducts(category = "all") {
       console.warn(`Could not load ${file}.json`);
     }
   }
-
-  // Render products without scroll preservation first
+  // Render products
   renderProducts(allProducts);
 
-  // Build filters without scroll preservation
+  // Build filters for current viewport
   buildFiltersForViewport(allProducts);
 
-  // Apply filters without scroll preservation
+  // Apply filters with scrolling
   if (
     lastSelectedFilters &&
     (lastSelectedFilters.gender ||
