@@ -100,7 +100,10 @@ function buildMobileFilters(data) {
       </div>
     `;
   });
-  genderPane.innerHTML = genderHTML;
+  genderPane.innerHTML = genderHTML; // Add event listeners to gender radio buttons to update materials state
+  genderPane.querySelectorAll('input[name="filterGender"]').forEach((radio) => {
+    radio.addEventListener("change", updateMobileMaterialsState);
+  });
   // Materials
   const materials = [...new Set(data.map((p) => p.materials).filter(Boolean))];
 
@@ -109,20 +112,31 @@ function buildMobileFilters(data) {
   materials.forEach((v) => {
     materialsCounts[v] = data.filter((p) => p.materials === v).length;
   });
-
   let materialsHTML = "";
   materials.forEach((v) => {
+    const count = materialsCounts[v];
+    const isDisabled = count === 0 ? "disabled" : "";
+    const labelStyle =
+      count === 0 ? 'style="color: #6c757d; opacity: 0.6;"' : "";
+
     materialsHTML += `
       <div class="form-check d-flex justify-content-between align-items-center">
         <div>
-          <input class="form-check-input" type="checkbox" name="filterMaterials" id="mobileFilterMaterials${v}" value="${v}">
-          <label class="form-check-label ms-1" for="mobileFilterMaterials${v}">${v}</label>
+          <input class="form-check-input" type="checkbox" name="filterMaterials" id="mobileFilterMaterials${v}" value="${v}" ${isDisabled}>
+          <label class="form-check-label ms-1" for="mobileFilterMaterials${v}" ${labelStyle}>${v}</label>
         </div>
-        <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${materialsCounts[v]}</span>
+        <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${count}</span>
       </div>
     `;
   });
   materialsPane.innerHTML = materialsHTML;
+
+  // Add event listeners to category radio buttons to update materials state
+  document
+    .querySelectorAll('#mobileCategory input[name="mobileCategory"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", updateMobileMaterialsState);
+    });
 
   // --- Add Event Listeners ---
 
@@ -142,21 +156,28 @@ function buildMobileFilters(data) {
   const offcanvasElement = document.getElementById("mobileFiltersOffcanvas");
   const offcanvas =
     bootstrap.Offcanvas.getInstance(offcanvasElement) ||
-    new bootstrap.Offcanvas(offcanvasElement);
-
-  // Store the category from when the filter was opened to see if we need to reload products
+    new bootstrap.Offcanvas(offcanvasElement); // Store the category from when the filter was opened to see if we need to reload products
   let categoryBeforeOpening = "all";
   offcanvasElement.addEventListener("show.bs.offcanvas", function () {
-    collectActiveFilters(); // Sync with current state
+    // Store the category before opening for comparison
     categoryBeforeOpening = lastSelectedFilters.category;
+
+    // Restore UI to match saved state (don't collect from UI)
+    reapplyFilters();
+
+    // Update materials counts and disable state based on current filters
+    updateMobileMaterialsState();
   });
 
-  // Listener for the "Apply Filters" button
+  // Reset UI to saved state when panel is closed without applying (optional enhancement)
+  offcanvasElement.addEventListener("hidden.bs.offcanvas", function () {
+    // Restore UI to match saved state in case user made changes but didn't apply
+    reapplyFilters();
+  }); // Listener for the "Apply Filters" button
   document
     .getElementById("mobileApplyFiltersBtn")
     .addEventListener("click", () => {
       collectActiveFilters(); // Collect new selections from the mobile UI
-
       offcanvas.hide();
 
       // If the category has changed, we must reload the products from the new JSON file.
@@ -166,25 +187,138 @@ function buildMobileFilters(data) {
       } else {
         applyFilters(lastSelectedFilters);
       }
-    });
-
-  // Listener for the "Clear" button, which only resets the form inside the off-canvas
+    }); // Listener for the "Clear" button, which resets filters and reloads products
   document
     .getElementById("mobileClearFiltersBtn")
     .addEventListener("click", () => {
-      // Reset category radio buttons
-      const catAllRadio = document.querySelector("#mobileCatAll");
-      if (catAllRadio) catAllRadio.checked = true;
+      // Reset the global state object (same as desktop clear)
+      lastSelectedFilters = { gender: "", materials: [], category: "all" };
 
-      // Reset gender radio buttons
+      // Clear the state from sessionStorage (same as desktop clear)
+      sessionStorage.removeItem("lastSelectedFilters");
+
+      // Reset category and gender radio buttons in UI
+      const catAllRadio = document.querySelector("#mobileCatAll");
       const genderAllRadio = document.querySelector("#mobileFilterGenderAll");
+      if (catAllRadio) catAllRadio.checked = true;
       if (genderAllRadio) genderAllRadio.checked = true;
 
-      // Uncheck all material checkboxes
-      const materialCheckboxes = document.querySelectorAll(
-        "#mobileFiltersOffcanvas input[name='filterMaterials']:checked"
+      // Reset all material filters to enabled state
+      const allMaterialCheckboxes = document.querySelectorAll(
+        "#mobileFiltersOffcanvas input[name='filterMaterials']"
       );
-      materialCheckboxes.forEach((cb) => (cb.checked = false));
+      const allMaterialLabels = document.querySelectorAll(
+        "#mobileFiltersOffcanvas input[name='filterMaterials'] + .form-check-label"
+      );
+      const allBadges = document.querySelectorAll(
+        "#mobileFiltersOffcanvas .materials-count"
+      );
+
+      allMaterialCheckboxes.forEach((cb) => {
+        cb.checked = false;
+        cb.disabled = false;
+      });
+
+      allMaterialLabels.forEach((label) => {
+        label.style.color = "";
+        label.style.opacity = "";
+        label.style.cursor = "";
+      });
+
+      allBadges.forEach((badge) => {
+        badge.classList.remove("disabled");
+      });
+
+      // Reload products with the 'all' category (same as desktop clear)
+      loadProducts("all");
+    });
+}
+
+// Cache for fetched category data to avoid repeated requests
+const categoryDataCache = {};
+
+// Function to update mobile materials state based on current filters
+async function updateMobileMaterialsState() {
+  const mobileOffcanvas = document.getElementById("mobileFiltersOffcanvas");
+  if (!mobileOffcanvas) return;
+
+  const selectedGender = document.querySelector(
+    "#mobileFiltersOffcanvas input[name='filterGender']:checked"
+  );
+  const selectedCategory = document.querySelector(
+    "#mobileFiltersOffcanvas input[name='mobileCategory']:checked"
+  );
+
+  const currentGender = selectedGender ? selectedGender.value : "";
+  const currentCategory = selectedCategory ? selectedCategory.value : "all";
+
+  // Get the data source for calculating materials counts
+  let dataSource = [];
+
+  if (currentCategory === lastSelectedFilters.category) {
+    // Use existing products if category matches
+    dataSource = _allProducts;
+  } else {
+    // Fetch data for preview with caching
+    const cacheKey = currentCategory;
+
+    if (categoryDataCache[cacheKey]) {
+      dataSource = categoryDataCache[cacheKey];
+    } else {
+      try {
+        const files =
+          currentCategory === "all"
+            ? ["belts", "wallets", "bags"]
+            : [currentCategory];
+
+        const fetchPromises = files.map(async (file) => {
+          const res = await fetch(`assets/data/${file}.json`);
+          return res.json();
+        });
+
+        const results = await Promise.all(fetchPromises);
+        dataSource = results.flat();
+
+        // Cache the result
+        categoryDataCache[cacheKey] = dataSource;
+      } catch (e) {
+        console.warn(`Could not load category data for preview: ${e.message}`);
+        dataSource = _allProducts; // Fallback
+      }
+    }
+  }
+
+  // Calculate materials counts
+  const materialsCounts = {};
+  dataSource.forEach((product) => {
+    if (!currentGender || product.gender === currentGender) {
+      const mat = product.materials;
+      materialsCounts[mat] = (materialsCounts[mat] || 0) + 1;
+    }
+  });
+
+  // Update UI elements
+  document
+    .querySelectorAll("#mobileFiltersOffcanvas .materials-count")
+    .forEach((badge) => {
+      const mat = badge.dataset.materials;
+      const count = materialsCounts[mat] || 0;
+      badge.textContent = count;
+
+      const checkbox = document.querySelector(
+        `#mobileFiltersOffcanvas input[name='filterMaterials'][value='${mat}']`
+      );
+      if (checkbox) {
+        const isDisabled = count === 0;
+        checkbox.disabled = isDisabled;
+
+        if (isDisabled) {
+          checkbox.checked = false;
+          badge.classList.add("disabled");
+        } else {
+          badge.classList.remove("disabled");
+        }
+      }
     });
 }
 

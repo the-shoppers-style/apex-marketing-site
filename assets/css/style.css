@@ -27,3 +27,34 @@ body {
 #productGrid {
   min-height: 200px; /* Ensure minimum height to reduce layout shifts */
 }
+
+/* Disabled materials filter styling for both desktop and mobile */
+input[name='filterMaterials']:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+input[name='filterMaterials']:disabled + label,
+input[name='filterMaterials']:disabled + .form-check-label {
+  color: #6c757d !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Disabled materials count badges - target the flex container structure */
+.form-check:has(input[name='filterMaterials']:disabled) .materials-count {
+  background-color: #6c757d !important;
+  opacity: 0.6 !important;
+}
+
+/* Fallback for browsers that don't support :has() - use JavaScript instead */
+.materials-count.disabled {
+  background-color: #6c757d !important;
+  opacity: 0.6 !important;
+}
+
+/* Mobile-specific styling to prevent interaction */
+#mobileFiltersOffcanvas input[name='filterMaterials']:disabled,
+#mobileFiltersOffcanvas input[name='filterMaterials']:disabled + .form-check-label {
+  pointer-events: none;
+}

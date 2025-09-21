@@ -60,14 +60,17 @@ function buildDesktopFilters(data) {
         values.forEach((v) => {
           counts[v] = data.filter((p) => p[attr] === v).length;
         });
-
         values.forEach((v) => {
           const id = `filterMaterials${v}`;
+          const isDisabled = counts[v] === 0 ? "disabled" : "";
+          const labelStyle =
+            counts[v] === 0 ? 'style="color: #6c757d; opacity: 0.6;"' : "";
+
           wrapper.innerHTML += `
             <div class="form-check d-flex justify-content-between align-items-center">
               <div>
-                <input class="form-check-input filter-materials" type="checkbox" name="filterMaterials" id="${id}" value="${v}">
-                <label class="form-check-label ms-1" for="${id}">${v}</label>
+                <input class="form-check-input filter-materials" type="checkbox" name="filterMaterials" id="${id}" value="${v}" ${isDisabled}>
+                <label class="form-check-label ms-1" for="${id}" ${labelStyle}>${v}</label>
               </div>
               <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${counts[v]}</span>
             </div>

@@ -99,13 +99,51 @@ function applyFilters(selected) {
       materialsCounts[mat] = (materialsCounts[mat] || 0) + 1;
     }
   });
-
   document.querySelectorAll(".materials-count").forEach((badge) => {
     const mat = badge.dataset.materials;
-    badge.textContent = materialsCounts[mat] || 0;
+    const count = materialsCounts[mat] || 0;
+    badge.textContent = count;
+
+    // Add/remove disabled class for badge styling
+    if (count === 0) {
+      badge.classList.add("disabled");
+    } else {
+      badge.classList.remove("disabled");
+    }
+
+    // Find ALL corresponding checkboxes for this material (desktop and mobile)
+    const checkboxes = document.querySelectorAll(
+      `input[name='filterMaterials'][value='${mat}']`
+    );
+
+    checkboxes.forEach((checkbox) => {
+      const label = checkbox.nextElementSibling;
+
+      if (count === 0) {
+        // Disable and grey out when count is 0
+        checkbox.disabled = true;
+        checkbox.checked = false; // Uncheck if it was checked
+        if (label) {
+          label.style.color = "#6c757d"; // Bootstrap's text-muted color
+          label.style.opacity = "0.6";
+        }
+      } else {
+        // Enable when count > 0
+        checkbox.disabled = false;
+        if (label) {
+          label.style.color = "";
+          label.style.opacity = "";
+        }
+      }
+    });
   });
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Update mobile materials state if mobile filters exist
+  if (typeof updateMobileMaterialsState === "function") {
+    updateMobileMaterialsState();
+  }
 }
 
 // ======================
@@ -148,7 +186,7 @@ function collectActiveFilters() {
     );
     materials = Array.from(
       document.querySelectorAll(
-        "#mobileFiltersOffcanvas input[name='filterMaterials']:checked"
+        "#mobileFiltersOffcanvas input[name='filterMaterials']:checked:not(:disabled)"
       )
     );
     category = document.querySelector(
@@ -163,7 +201,7 @@ function collectActiveFilters() {
     );
     materials = Array.from(
       document.querySelectorAll(
-        "#filtersWrapper input[name='filterMaterials']:checked"
+        "#filtersWrapper input[name='filterMaterials']:checked:not(:disabled)"
       )
     );
     const categorySelector = document.getElementById("categorySelector");
@@ -198,7 +236,7 @@ function reapplyFilters() {
       const matCb = document.querySelector(
         `#mobileFiltersOffcanvas input[name='filterMaterials'][value='${v}']`
       );
-      if (matCb) matCb.checked = true;
+      if (matCb && !matCb.disabled) matCb.checked = true;
     });
 
     const categoryRadioMobile = document.querySelector(
@@ -222,7 +260,7 @@ function reapplyFilters() {
       const matCb = document.querySelector(
         `#filtersWrapper input[name='filterMaterials'][value='${v}']`
       );
-      if (matCb) matCb.checked = true;
+      if (matCb && !matCb.disabled) matCb.checked = true;
     });
 
     const catSelector = document.getElementById("categorySelector");
