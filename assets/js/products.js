@@ -244,13 +244,25 @@ waitFor("buildDesktopFilters", () => {
       const materialCheckboxes = document.querySelectorAll(
         "input[name='filterMaterials']:checked"
       );
-      materialCheckboxes.forEach((cb) => (cb.checked = false));
-
-      // Reset stored filters
+      materialCheckboxes.forEach((cb) => (cb.checked = false)); // Reset stored filters
       lastSelectedFilters = { gender: "", materials: [], category: "all" };
 
-      // Apply cleared filters
-      applyFilters(lastSelectedFilters);
+      // Add fade animation during filter clearing
+      productGrid.classList.add("fade-out");
+
+      setTimeout(() => {
+        // Apply cleared filters
+        applyFilters(lastSelectedFilters);
+
+        // Fade back in
+        productGrid.classList.remove("fade-out");
+        productGrid.classList.add("fade-in");
+
+        // Clean up fade-in class after animation
+        setTimeout(() => {
+          productGrid.classList.remove("fade-in");
+        }, 300);
+      }, 150);
     });
   }
 });
