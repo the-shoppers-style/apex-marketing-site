@@ -2,11 +2,11 @@
 // Global State Management
 // ======================
 
-// *** FIX #1: Create a reliable, global "source of truth" for the product list. ***
-// This will hold all products for the currently selected category.
 let _allProducts = [];
+// NEW: A master list to hold ALL products from all categories, used to build a complete filter UI.
+let _masterProductList = [];
 
-// *** FIX #2: Use sessionStorage to persist filters across page reloads. ***
+// Use sessionStorage to persist filters across page reloads.
 let lastSelectedFilters = JSON.parse(
   sessionStorage.getItem("lastSelectedFilters")
 ) || {
@@ -17,6 +17,25 @@ let lastSelectedFilters = JSON.parse(
 
 let currentFilterMode = null;
 const productGrid = document.getElementById("productGrid");
+
+// ======================
+// NEW: URL Management
+// ======================
+
+/**
+ * Updates the browser's URL with the selected category without reloading the page.
+ * @param {string} category The category to set in the URL (e.g., 'belts', or 'all').
+ */
+function updateUrlCategory(category) {
+  const currentUrl = new URL(window.location);
+  if (category && category !== "all") {
+    currentUrl.searchParams.set("category", category);
+  } else {
+    currentUrl.searchParams.delete("category");
+  }
+  // Use replaceState to change the URL without creating new browser history entries for filter changes.
+  history.replaceState({ category: category }, "", currentUrl.toString());
+}
 
 // ======================
 // Core product rendering
@@ -57,48 +76,49 @@ function renderProducts(products) {
 // Filtering logic
 // ======================
 function applyFilters(selected) {
-  const allCards = document.querySelectorAll(".product-card");
+  // Use _allProducts as the source of truth for filtering
+  const productsToFilter = _allProducts;
   const noProductsMessage = document.getElementById("noProductsMessage");
   let visibleCount = 0;
 
-  allCards.forEach((card) => {
+  // First, filter the product data in memory
+  const filteredProducts = productsToFilter.filter((product) => {
+    const cardData = product; // Use the product data directly
     const matches = Object.entries(selected).every(([key, value]) => {
       if (!value || (Array.isArray(value) && value.length === 0)) return true;
 
-      // Skip category filter if products are already pre-filtered by category loading
-      if (key === "category") {
-        // Only apply category filter if we loaded "all" categories
-        if (lastSelectedFilters.category === "all") {
-          return value === "all" || card.dataset[key] === value;
-        } else {
-          // Products are already filtered by category during loading, so ignore category filter
-          return true;
-        }
-      }
+      // The category is already handled by loadProducts, so we only need to filter gender and materials
+      if (key === "category") return true;
 
-      if (Array.isArray(value)) return value.includes(card.dataset[key]);
-      return card.dataset[key] === value;
+      if (Array.isArray(value)) return value.includes(cardData[key]);
+      return cardData[key] === value;
     });
-
-    card.style.display = matches ? "block" : "none";
-    if (matches) visibleCount++;
+    return matches;
   });
 
+  // Now, render the filtered products
+  renderProducts(filteredProducts);
+  visibleCount = filteredProducts.length;
+
   noProductsMessage.style.display = visibleCount === 0 ? "block" : "none";
+
+  // MODIFIED: Calculate material counts based on the currently loaded products (_allProducts)
+  // and the selected gender, to show what is available within the current category.
   const materialsCounts = {};
-  allCards.forEach((card) => {
+  _allProducts.forEach((card) => {
     // For materials count, only filter by gender (since products are already pre-filtered by category during loading)
     const matchesGender =
       !selected.gender ||
       selected.gender === "" ||
-      card.dataset.gender === selected.gender;
+      card.gender === selected.gender;
 
     // Only count if it matches gender filter
     if (matchesGender) {
-      const mat = card.dataset.materials;
+      const mat = card.materials;
       materialsCounts[mat] = (materialsCounts[mat] || 0) + 1;
     }
   });
+
   document.querySelectorAll(".materials-count").forEach((badge) => {
     const mat = badge.dataset.materials;
     const count = materialsCounts[mat] || 0;
@@ -120,9 +140,8 @@ function applyFilters(selected) {
       const label = checkbox.nextElementSibling;
 
       if (count === 0) {
-        // Disable and grey out when count is 0
         checkbox.disabled = true;
-        checkbox.checked = false; // Uncheck if it was checked
+        checkbox.checked = false; // Uncheck if disabled
         if (label) {
           label.style.color = "#6c757d"; // Bootstrap's text-muted color
           label.style.opacity = "0.6";
@@ -150,7 +169,10 @@ function applyFilters(selected) {
 // Product Loader
 // ======================
 async function loadProducts(category = "all") {
+  // Update the URL to reflect the loaded category
+  updateUrlCategory(category);
   lastSelectedFilters.category = category; // Update category in state
+
   const files = category === "all" ? ["belts", "wallets", "bags"] : [category];
   let loadedProducts = [];
 
@@ -164,11 +186,12 @@ async function loadProducts(category = "all") {
     }
   }
 
-  // *** Update the global "source of truth" for products ***
   _allProducts = loadedProducts;
 
-  renderProducts(_allProducts);
-  buildFiltersForViewport(_allProducts);
+  // MODIFIED: Pass the master list to build the filter UI structure
+  buildFiltersForViewport(_masterProductList);
+
+  // Re-apply all filters (including gender/material) to the newly loaded products
   reapplyFilters();
 }
 
@@ -212,7 +235,6 @@ function collectActiveFilters() {
       : "all";
   }
 
-  // *** Save the updated state to sessionStorage ***
   sessionStorage.setItem(
     "lastSelectedFilters",
     JSON.stringify(lastSelectedFilters)
@@ -264,8 +286,10 @@ function reapplyFilters() {
     });
 
     const catSelector = document.getElementById("categorySelector");
+    // Ensure the category selector is updated to reflect the state
     if (catSelector) catSelector.value = lastSelectedFilters.category;
   }
+  // This is the final step that filters the visible products
   applyFilters(lastSelectedFilters);
 }
 
@@ -295,11 +319,11 @@ function buildFiltersForViewport(data) {
   }
 }
 
-// *** FIX #3: The resize handler is now simple and reliable. ***
-// It no longer scrapes the DOM. It uses the `_allProducts` source of truth.
+// The resize handler now passes the master list to rebuild the filters correctly.
+// It no longer scrapes the DOM.
 window.addEventListener("resize", () => {
-  if (_allProducts.length > 0) {
-    buildFiltersForViewport(_allProducts);
+  if (_masterProductList.length > 0) {
+    buildFiltersForViewport(_masterProductList);
   }
 });
 
@@ -312,24 +336,49 @@ function waitFor(fnName, cb, timeout = 3000) {
   })();
 }
 
-// Initial page load
-waitFor("buildDesktopFilters", () => {
-  // Load products based on the category saved in sessionStorage (or 'all')
-  loadProducts(lastSelectedFilters.category);
+// NEW: Function to load all product data to build a complete filter list
+async function initializeMasterData() {
+  try {
+    const allFiles = ["belts", "wallets", "bags"];
+    const fetchPromises = allFiles.map((file) =>
+      fetch(`assets/data/${file}.json`).then((res) => res.json())
+    );
+    const allProductArrays = await Promise.all(fetchPromises);
+    _masterProductList = allProductArrays.flat();
+  } catch (e) {
+    console.error("Could not load master product list for filters.", e);
+  }
+}
+
+// MODIFIED: Initial page load logic
+waitFor("buildDesktopFilters", async () => {
+  // First, load all product data to build complete filters
+  await initializeMasterData();
+
+  // Then, determine the category to display
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlCategory = urlParams.get("category");
+
+  let initialCategory = "all";
+  if (urlCategory) {
+    // URL parameter has the highest priority
+    initialCategory = urlCategory;
+  } else {
+    // Fall back to sessionStorage if no URL param
+    initialCategory = lastSelectedFilters.category;
+  }
+
+  // Load the products for the determined category. This will also build the UI and apply all filters.
+  await loadProducts(initialCategory);
 
   const clearFiltersBtn = document.getElementById("clearFiltersBtn");
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", () => {
-      // Reset the central state object
       lastSelectedFilters = { gender: "", materials: [], category: "all" };
-
-      // *** Clear the state from sessionStorage ***
       sessionStorage.removeItem("lastSelectedFilters");
-
+      updateUrlCategory("all"); // Also clear the URL
       // Reload products with the 'all' category and apply cleared filters
       loadProducts("all");
-
-      // Animate the change
       productGrid.classList.add("fade-out");
       setTimeout(() => {
         productGrid.classList.remove("fade-out");

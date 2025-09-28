@@ -3,7 +3,7 @@
 // ======================
 
 // Main function to build the mobile filter UI
-function buildMobileFilters(data) {
+function buildMobileFilters(masterData) {
   // Avoid re-creating the filter UI if it already exists
   if (document.getElementById("mobileFiltersOffcanvas")) {
     return;
@@ -85,7 +85,7 @@ function buildMobileFilters(data) {
   const materialsPane = document.getElementById("mobileMaterials");
 
   // Gender
-  const genders = [...new Set(data.map((p) => p.gender).filter(Boolean))];
+  const genders = [...new Set(masterData.map((p) => p.gender).filter(Boolean))];
   let genderHTML = `
     <div class="form-check">
       <input class="form-check-input" type="radio" name="filterGender" id="mobileFilterGenderAll" value="" checked>
@@ -104,17 +104,21 @@ function buildMobileFilters(data) {
   genderPane.querySelectorAll('input[name="filterGender"]').forEach((radio) => {
     radio.addEventListener("change", updateMobileMaterialsState);
   });
-  // Materials
-  const materials = [...new Set(data.map((p) => p.materials).filter(Boolean))];
 
-  // Calculate initial counts for materials
+  // Materials
+  const materials = [
+    ...new Set(masterData.map((p) => p.materials).filter(Boolean)),
+  ];
+
+  // Calculate counts from currently loaded products (_allProducts)
   const materialsCounts = {};
-  materials.forEach((v) => {
-    materialsCounts[v] = data.filter((p) => p.materials === v).length;
+  _allProducts.forEach((p) => {
+    materialsCounts[p.materials] = (materialsCounts[p.materials] || 0) + 1;
   });
+
   let materialsHTML = "";
   materials.forEach((v) => {
-    const count = materialsCounts[v];
+    const count = materialsCounts[v] || 0;
     const isDisabled = count === 0 ? "disabled" : "";
     const labelStyle =
       count === 0 ? 'style="color: #6c757d; opacity: 0.6;"' : "";
@@ -129,6 +133,7 @@ function buildMobileFilters(data) {
       </div>
     `;
   });
+
   materialsPane.innerHTML = materialsHTML;
 
   // Add event listeners to category radio buttons to update materials state
@@ -157,6 +162,7 @@ function buildMobileFilters(data) {
   const offcanvas =
     bootstrap.Offcanvas.getInstance(offcanvasElement) ||
     new bootstrap.Offcanvas(offcanvasElement); // Store the category from when the filter was opened to see if we need to reload products
+
   let categoryBeforeOpening = "all";
   offcanvasElement.addEventListener("show.bs.offcanvas", function () {
     // Store the category before opening for comparison
@@ -174,20 +180,27 @@ function buildMobileFilters(data) {
     // Restore UI to match saved state in case user made changes but didn't apply
     reapplyFilters();
   }); // Listener for the "Apply Filters" button
+
   document
     .getElementById("mobileApplyFiltersBtn")
     .addEventListener("click", () => {
-      collectActiveFilters(); // Collect new selections from the mobile UI
+      collectActiveFilters();
       offcanvas.hide();
 
       // If the category has changed, we must reload the products from the new JSON file.
       // If not, we can just apply the filters to the products already in the view.
       if (lastSelectedFilters.category !== categoryBeforeOpening) {
+        // When category changes, reset other filters
+        lastSelectedFilters.gender = "";
+        lastSelectedFilters.materials = [];
+        updateUrlCategory(lastSelectedFilters.category); // Update URL
         loadProducts(lastSelectedFilters.category);
       } else {
         applyFilters(lastSelectedFilters);
       }
-    }); // Listener for the "Clear" button, which resets filters and reloads products
+    });
+
+  // Listener for the "Clear" button, which resets filters and reloads products
   document
     .getElementById("mobileClearFiltersBtn")
     .addEventListener("click", () => {

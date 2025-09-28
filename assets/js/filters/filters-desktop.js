@@ -5,7 +5,7 @@
 let filters = {};
 
 // Build filters (Gender, Materials, Category)
-function buildDesktopFilters(data) {
+function buildDesktopFilters(masterData) {
   const filtersRow = document.getElementById("filtersRow");
   const categorySelector = document.getElementById("categorySelector");
 
@@ -16,7 +16,8 @@ function buildDesktopFilters(data) {
   const attributes = ["gender", "materials"];
 
   attributes.forEach((attr) => {
-    const values = [...new Set(data.map((p) => p[attr]).filter(Boolean))];
+    // Get all possible values from the MASTER list to build the UI structure
+    const values = [...new Set(masterData.map((p) => p[attr]).filter(Boolean))];
     if (values.length > 0) {
       const wrapper = document.createElement("div");
       wrapper.className = "mb-3";
@@ -27,7 +28,6 @@ function buildDesktopFilters(data) {
       wrapper.appendChild(label);
 
       if (attr === "gender") {
-        // Radios for Gender
         const allId = `filterGenderAll`;
         wrapper.innerHTML += `
           <div class="form-check">
@@ -56,15 +56,18 @@ function buildDesktopFilters(data) {
       }
 
       if (attr === "materials") {
+        // Calculate counts based on the CURRENTLY loaded products (_allProducts)
         const counts = {};
-        values.forEach((v) => {
-          counts[v] = data.filter((p) => p[attr] === v).length;
+        _allProducts.forEach((p) => {
+          counts[p.materials] = (counts[p.materials] || 0) + 1;
         });
+
         values.forEach((v) => {
           const id = `filterMaterials${v}`;
-          const isDisabled = counts[v] === 0 ? "disabled" : "";
+          const currentCount = counts[v] || 0; // Use the calculated count
+          const isDisabled = currentCount === 0 ? "disabled" : "";
           const labelStyle =
-            counts[v] === 0 ? 'style="color: #6c757d; opacity: 0.6;"' : "";
+            currentCount === 0 ? 'style="color: #6c757d; opacity: 0.6;"' : "";
 
           wrapper.innerHTML += `
             <div class="form-check d-flex justify-content-between align-items-center">
@@ -72,7 +75,7 @@ function buildDesktopFilters(data) {
                 <input class="form-check-input filter-materials" type="checkbox" name="filterMaterials" id="${id}" value="${v}" ${isDisabled}>
                 <label class="form-check-label ms-1" for="${id}" ${labelStyle}>${v}</label>
               </div>
-              <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${counts[v]}</span>
+              <span class="badge bg-secondary rounded-pill materials-count" data-materials="${v}">${currentCount}</span>
             </div>
           `;
         });
@@ -90,12 +93,20 @@ function buildDesktopFilters(data) {
 
   // Category filter (dropdown) is static, just listen
   if (categorySelector) {
-    categorySelector.addEventListener("change", async () => {
-      await loadProducts(categorySelector.value);
+    // Remove any old listener to prevent duplicates
+    const newSelector = categorySelector.cloneNode(true);
+    categorySelector.parentNode.replaceChild(newSelector, categorySelector);
+
+    newSelector.addEventListener("change", async () => {
+      const newCategory = newSelector.value;
+      // Update URL when category changes
+      updateUrlCategory(newCategory);
+      // When category changes, reset other filters
+      lastSelectedFilters.gender = "";
+      lastSelectedFilters.materials = [];
+      await loadProducts(newCategory);
     });
   }
-
-  // Initial apply
 }
 
 // Collect current filter selections and apply
