@@ -35,102 +35,172 @@
 
         <div class="row g-4">
           <!-- Belts - Available Now -->
-          <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card h-100 shadow-sm border-0 product-category-card">
-              <div class="position-relative">
+          <div class="col-lg-4 col-md-6">
+            <div class="modern-category-card available">
+              <div class="card-image-container">
                 <img
                   src="assets/images/categories/belts.webp"
-                  class="card-img-top category-hero-img"
+                  class="category-image"
                   alt="Premium Belts Collection"
                   loading="lazy"
                 />
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-success fs-6">Available Now</span>
+                <div class="image-overlay"></div>
+                <div class="status-badge available-badge">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"
+                    />
+                  </svg>
+                  Available Now
                 </div>
               </div>
-              <div class="card-body text-center d-flex flex-column">
-                <h5 class="card-title fw-bold">Premium Belts</h5>
-                <p class="card-text text-muted flex-grow-1">
-                  Handcrafted leather belts for men, women, and kids. Elegant
-                  designs that complement any outfit.
-                </p>
+              <div class="card-content">
+                <div class="category-info">
+                  <h3 class="category-title">Premium Belts</h3>
+                  <p class="category-description">
+                    Handcrafted leather belts for men, women, and kids. Elegant
+                    designs that complement any outfit.
+                  </p>
+                </div>
                 <a
                   href="products.html?category=belts"
-                  class="btn btn-primary mt-auto"
+                  class="modern-btn primary-btn"
                 >
-                  Shop Belts
+                  <span>Shop Collection</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+                    />
+                  </svg>
                 </a>
               </div>
             </div>
           </div>
 
           <!-- Wallets - Coming Soon -->
-          <div class="col-lg-4 col-md-6 col-sm-12">
-            <div
-              class="card h-100 shadow-sm border-0 product-category-card coming-soon"
-            >
-              <div class="position-relative">
+          <div class="col-lg-4 col-md-6">
+            <div class="modern-category-card coming-soon">
+              <div class="card-image-container">
                 <img
                   src="assets/images/categories/wallets.webp"
-                  class="card-img-top category-hero-img"
+                  class="category-image"
                   alt="Premium Wallets Collection"
                   loading="lazy"
                 />
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-warning text-dark fs-6"
-                    >Coming Soon</span
+                <div class="image-overlay"></div>
+                <div class="status-badge coming-soon-badge">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
                   >
+                    <path
+                      d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                    />
+                    <path
+                      d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                    />
+                  </svg>
+                  Coming Soon
                 </div>
                 <div class="coming-soon-overlay">
-                  <div class="coming-soon-text">
-                    <h6 class="text-white fw-bold">Coming Soon</h6>
+                  <div class="coming-soon-content">
+                    <h4>Launching Soon</h4>
+                    <p>Be the first to know</p>
                   </div>
                 </div>
               </div>
-              <div class="card-body text-center d-flex flex-column">
-                <h5 class="card-title fw-bold">Premium Wallets</h5>
-                <p class="card-text text-muted flex-grow-1">
-                  Stylish and functional wallets crafted from finest materials.
-                  Perfect for organizing your essentials.
-                </p>
-                <button class="btn btn-outline-secondary mt-auto" disabled>
-                  Notify Me
+              <div class="card-content">
+                <div class="category-info">
+                  <h3 class="category-title">Premium Wallets</h3>
+                  <p class="category-description">
+                    Stylish and functional wallets crafted from finest
+                    materials. Perfect for organizing your essentials.
+                  </p>
+                </div>
+                <button class="modern-btn secondary-btn" disabled>
+                  <span>Notify Me</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
           </div>
 
           <!-- Bags - Coming Soon -->
-          <div class="col-lg-4 col-md-6 col-sm-12">
-            <div
-              class="card h-100 shadow-sm border-0 product-category-card coming-soon"
-            >
-              <div class="position-relative">
+          <div class="col-lg-4 col-md-6">
+            <div class="modern-category-card coming-soon">
+              <div class="card-image-container">
                 <img
                   src="assets/images/categories/bags.webp"
-                  class="card-img-top category-hero-img"
+                  class="category-image"
                   alt="Premium Bags Collection"
                   loading="lazy"
                 />
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-warning text-dark fs-6"
-                    >Coming Soon</span
+                <div class="image-overlay"></div>
+                <div class="status-badge coming-soon-badge">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
                   >
+                    <path
+                      d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                    />
+                    <path
+                      d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                    />
+                  </svg>
+                  Coming Soon
                 </div>
                 <div class="coming-soon-overlay">
-                  <div class="coming-soon-text">
-                    <h6 class="text-white fw-bold">Coming Soon</h6>
+                  <div class="coming-soon-content">
+                    <h4>Launching Soon</h4>
+                    <p>Be the first to know</p>
                   </div>
                 </div>
               </div>
-              <div class="card-body text-center d-flex flex-column">
-                <h5 class="card-title fw-bold">Premium Bags</h5>
-                <p class="card-text text-muted flex-grow-1">
-                  Luxury bags designed for modern lifestyle. From casual to
-                  formal, find your perfect companion.
-                </p>
-                <button class="btn btn-outline-secondary mt-auto" disabled>
-                  Notify Me
+              <div class="card-content">
+                <div class="category-info">
+                  <h3 class="category-title">Premium Bags</h3>
+                  <p class="category-description">
+                    Luxury bags designed for modern lifestyle. From casual to
+                    formal, find your perfect companion.
+                  </p>
+                </div>
+                <button class="modern-btn secondary-btn" disabled>
+                  <span>Notify Me</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
