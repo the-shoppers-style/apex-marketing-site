@@ -168,8 +168,8 @@ function buildMobileFilters(masterData) {
     // Store the category before opening for comparison
     categoryBeforeOpening = lastSelectedFilters.category;
 
-    // Restore UI to match saved state (don't collect from UI)
-    reapplyFilters();
+    // Sync UI to match saved state without re-rendering products (preserves scroll position)
+    reapplyFilters(false);
 
     // Update materials counts and disable state based on current filters
     updateMobileMaterialsState();
@@ -177,8 +177,8 @@ function buildMobileFilters(masterData) {
 
   // Reset UI to saved state when panel is closed without applying (optional enhancement)
   offcanvasElement.addEventListener("hidden.bs.offcanvas", function () {
-    // Restore UI to match saved state in case user made changes but didn't apply
-    reapplyFilters();
+    // Sync UI to match saved state without re-rendering products (preserves scroll position)
+    reapplyFilters(false);
   }); // Listener for the "Apply Filters" button
 
   document
@@ -196,7 +196,7 @@ function buildMobileFilters(masterData) {
         updateUrlCategory(lastSelectedFilters.category); // Update URL
         loadProducts(lastSelectedFilters.category);
       } else {
-        applyFilters(lastSelectedFilters);
+        applyFilters(lastSelectedFilters, true); // Scroll to top when applying filters
       }
     });
 
@@ -243,7 +243,10 @@ function buildMobileFilters(masterData) {
       });
 
       // Reload products with the 'all' category (same as desktop clear)
-      loadProducts("all");
+      loadProducts("all").then(() => {
+        // Scroll to top after clearing filters
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     });
 }
 

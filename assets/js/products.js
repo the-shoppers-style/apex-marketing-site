@@ -75,7 +75,7 @@ function renderProducts(products) {
 // ======================
 // Filtering logic
 // ======================
-function applyFilters(selected) {
+function applyFilters(selected, shouldScrollToTop = true) {
   // Use _allProducts as the source of truth for filtering
   const productsToFilter = _allProducts;
   const noProductsMessage = document.getElementById("noProductsMessage");
@@ -157,7 +157,9 @@ function applyFilters(selected) {
     });
   });
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (shouldScrollToTop) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   // Update mobile materials state if mobile filters exist
   if (typeof updateMobileMaterialsState === "function") {
@@ -242,7 +244,7 @@ function collectActiveFilters() {
 }
 
 // Helper: Applies the saved `lastSelectedFilters` state to the current UI.
-function reapplyFilters() {
+function reapplyFilters(shouldApplyFilters = true) {
   if (currentFilterMode === "mobile") {
     const genderRadioMobile = document.querySelector(
       `#mobileFiltersOffcanvas input[name='filterGender'][value='${
@@ -289,8 +291,10 @@ function reapplyFilters() {
     // Ensure the category selector is updated to reflect the state
     if (catSelector) catSelector.value = lastSelectedFilters.category;
   }
-  // This is the final step that filters the visible products
-  applyFilters(lastSelectedFilters);
+  // Only apply filters if requested (to avoid unnecessary product re-rendering)
+  if (shouldApplyFilters) {
+    applyFilters(lastSelectedFilters, false);
+  }
 }
 
 // Decides which filter UI to build and manages the transition.
@@ -381,7 +385,10 @@ waitFor("buildDesktopFilters", async () => {
       sessionStorage.removeItem("lastSelectedFilters");
       updateUrlCategory("all"); // Also clear the URL
       // Reload products with the 'all' category and apply cleared filters
-      loadProducts("all");
+      loadProducts("all").then(() => {
+        // Scroll to top after clearing filters
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
       productGrid.classList.add("fade-out");
       setTimeout(() => {
         productGrid.classList.remove("fade-out");
