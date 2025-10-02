@@ -59,6 +59,13 @@ input[name='filterMaterials']:disabled + .form-check-label {
   pointer-events: none;
 }
 
+/* Add bottom margin to product grid on mobile to account for sticky filter button */
+@media (max-width: 767px) {
+  #productGrid {
+    margin-bottom: 60px; /* Space for the sticky filter button (button height + padding + extra space) */
+  }
+}
+
 /* ========================
    Modern Category Cards
    ======================== */
