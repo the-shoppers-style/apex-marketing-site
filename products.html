@@ -30,7 +30,7 @@
                   >Category</label
                 >
                 <select id="categorySelector" class="form-select">
-                  <option value="all" selected>All</option>
+                  <option value="all">All</option>
                   <option value="belts">Belts</option>
                   <option value="wallets">Wallets</option>
                   <option value="bags">Bags</option>
@@ -115,6 +115,30 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Immediate category selector fix -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get("category");
+        if (category) {
+          const selector = document.getElementById("categorySelector");
+          if (selector) {
+            selector.value = category;
+            Array.from(selector.options).forEach((option) => {
+              if (option.value === category) {
+                option.selected = true;
+                option.setAttribute("selected", "selected");
+              } else {
+                option.selected = false;
+                option.removeAttribute("selected");
+              }
+            });
+          }
+        }
+      });
+    </script>
+
     <script src="assets/js/include.js"></script>
     <script src="assets/js/filters/filters-desktop.js"></script>
     <script src="assets/js/filters/filters-mobile.js"></script>

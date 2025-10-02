@@ -368,6 +368,9 @@ waitFor("buildDesktopFilters", async () => {
     initialCategory = lastSelectedFilters.category;
   }
 
+  // Update the global state BEFORE loading products so reapplyFilters() can use it
+  lastSelectedFilters.category = initialCategory;
+
   // Load the products for the determined category. This will also build the UI and apply all filters.
   await loadProducts(initialCategory);
 
