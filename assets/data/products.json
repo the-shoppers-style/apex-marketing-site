@@ -1,0 +1,334 @@
+{
+    "products": [
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Black Leather Belt",
+            "description": "Premium quality leather belt for men.",
+            "image": "assets/images/belt1.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Belts"
+        },
+        {
+            "title": "Brown Synthetic Belt",
+            "description": "Lightweight and stylish synthetic belt.",
+            "image": "assets/images/belt2.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Belts"
+        },
+        {
+            "title": "Kids Canvas Belt",
+            "description": "Durable belt designed for kids.",
+            "image": "assets/images/belt3.jpg",
+            "materials": "Canvas",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Belts"
+        },
+        {
+            "title": "Classic Leather Wallet",
+            "description": "Slim, durable leather wallet with multiple card slots.",
+            "image": "assets/images/wallet1.jpg",
+            "materials": "Leather",
+            "size": "Small",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Wallets"
+        },
+        {
+            "title": "Ladies Clutch Wallet",
+            "description": "Elegant clutch wallet for women with zipper compartment.",
+            "image": "assets/images/wallet2.jpg",
+            "materials": "Leather",
+            "size": "Medium",
+            "gender": "Women",
+            "color": "Brown",
+            "category": "Wallets"
+        },
+        {
+            "title": "Kids Mini Wallet",
+            "description": "Compact wallet designed for kids to carry essentials.",
+            "image": "assets/images/wallet3.jpg",
+            "materials": "Synthetic",
+            "size": "Small",
+            "gender": "Kids",
+            "color": "Blue",
+            "category": "Wallets"
+        },
+        {
+            "title": "Travel Duffel Bag",
+            "description": "Spacious leather duffel bag perfect for weekend trips.",
+            "image": "assets/images/bag1.jpg",
+            "materials": "Leather",
+            "size": "Large",
+            "gender": "Men",
+            "color": "Brown",
+            "category": "Bags"
+        },
+        {
+            "title": "Laptop Messenger Bag",
+            "description": "Stylish messenger bag with padded laptop compartment.",
+            "image": "assets/images/bag2.jpg",
+            "materials": "Synthetic",
+            "size": "Medium",
+            "gender": "Men",
+            "color": "Black",
+            "category": "Bags"
+        },
+        {
+            "title": "Ladies Handbag",
+            "description": "Chic handbag for women with premium finish.",
+            "image": "assets/images/bag3.jpg",
+            "materials": "Artificial",
+            "size": "Medium",
+            "gender": "Women",
+            "color": "Red",
+            "category": "Bags"
+        }
+    ]
+}

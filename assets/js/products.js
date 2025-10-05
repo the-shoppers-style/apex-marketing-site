@@ -175,20 +175,22 @@ async function loadProducts(category = "all") {
   updateUrlCategory(category);
   lastSelectedFilters.category = category; // Update category in state
 
-  const files = category === "all" ? ["belts", "wallets", "bags"] : [category];
-  let loadedProducts = [];
+  try {
+    const response = await fetch(`assets/data/products.json`);
+    const data = await response.json();
 
-  for (const file of files) {
-    try {
-      const res = await fetch(`assets/data/${file}.json`);
-      const data = await res.json();
-      loadedProducts = loadedProducts.concat(data);
-    } catch (e) {
-      console.warn(`Could not load ${file}.json`);
+    // Filter products by category
+    if (category === "all") {
+      _allProducts = data.products;
+    } else {
+      _allProducts = data.products.filter(
+        (product) => product.category.toLowerCase() === category.toLowerCase()
+      );
     }
+  } catch (e) {
+    console.error(`Could not load products.json`);
+    _allProducts = [];
   }
-
-  _allProducts = loadedProducts;
 
   // MODIFIED: Pass the master list to build the filter UI structure
   buildFiltersForViewport(_masterProductList);
@@ -343,12 +345,9 @@ function waitFor(fnName, cb, timeout = 3000) {
 // NEW: Function to load all product data to build a complete filter list
 async function initializeMasterData() {
   try {
-    const allFiles = ["belts", "wallets", "bags"];
-    const fetchPromises = allFiles.map((file) =>
-      fetch(`assets/data/${file}.json`).then((res) => res.json())
-    );
-    const allProductArrays = await Promise.all(fetchPromises);
-    _masterProductList = allProductArrays.flat();
+    const response = await fetch(`assets/data/products.json`);
+    const data = await response.json();
+    _masterProductList = data.products;
   } catch (e) {
     console.error("Could not load master product list for filters.", e);
   }

@@ -282,23 +282,23 @@ async function updateMobileMaterialsState() {
       dataSource = categoryDataCache[cacheKey];
     } else {
       try {
-        const files =
-          currentCategory === "all"
-            ? ["belts", "wallets", "bags"]
-            : [currentCategory];
+        const response = await fetch(`assets/data/products.json`);
+        const data = await response.json();
 
-        const fetchPromises = files.map(async (file) => {
-          const res = await fetch(`assets/data/${file}.json`);
-          return res.json();
-        });
-
-        const results = await Promise.all(fetchPromises);
-        dataSource = results.flat();
+        // Filter products by category
+        if (currentCategory === "all") {
+          dataSource = data.products;
+        } else {
+          dataSource = data.products.filter(
+            (product) =>
+              product.category.toLowerCase() === currentCategory.toLowerCase()
+          );
+        }
 
         // Cache the result
         categoryDataCache[cacheKey] = dataSource;
       } catch (e) {
-        console.warn(`Could not load category data for preview: ${e.message}`);
+        console.error(`Could not load category data for preview: ${e.message}`);
         dataSource = _allProducts; // Fallback
       }
     }
